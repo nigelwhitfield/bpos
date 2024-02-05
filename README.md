@@ -23,9 +23,6 @@ card reader, like a Square or MyPOS device, and can link to a Bluetooth ESC/POS 
 This app is supplied as a [B4X Project](bpos.zip), and can be built using [B4A](https://www.b4x.com/b4a.html) from 
 Anywhere Software.
 
-This app 
-
-
 ## Important notes
 This is a work in progress; it's had sufficient features added and tested for us to use at a forthcoming event, but there's
 some work needed to make the printing more reliable, especially around requesting permissons on different Android devices.
