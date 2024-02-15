@@ -23,6 +23,7 @@ card reader, like a Square or MyPOS device, and can link to a Bluetooth ESC/POS 
 This app is supplied as a [B4X Project](bpos.zip), and can be built using [B4A](https://www.b4x.com/b4a.html) from 
 Anywhere Software.
 
+
 ## Important notes
 This is a work in progress; it's had sufficient features added and tested for us to use at a forthcoming event, but there's
 some work needed to make the printing more reliable, especially around requesting permissons on different Android devices.
@@ -40,12 +41,14 @@ symbols can tie you up in knots.
 By default, the app will generate a dummy set of ten products, with random prices, so that you can see how it works without
 having to spend time importing data.
 
-To add a product to the basket, tap it's image. To add more, tap the same image again. To remove a product, tap the trash icon
-next to in the Current Sale list. You'll be asked if you want to remove just one, or remove the product from entirely.
+To add a product to the basket, tap its image. To add more, tap the same image again. To remove a product, tap the trash icon
+next to the product in the Current Sale list. You'll be asked if you want to remove just one, or remove the product from 
+the list entirely.
 
-When all products are added, you grab your card machine, enter the total in shown on screen, and ask the customer to pay. If 
+When all products are added, you grab your card machine, enter the total shown on screen, and ask the customer to pay. If 
 the payment succeeds, tap the green tick button, and you'll be asked if you want to print a receipt. If the transaction failed,
-tap cancel. Tap No to proceed without a receipt, which will record the sale in the logs.
+tap cancel. Tap No to proceed without a receipt. Either way, the sale will be recorded in the logs. Tap Cancel if you do not
+want the sale logged.
 
 The current sale can be cleared by pressing the red cross button.
 
@@ -56,29 +59,30 @@ You can tap the trash icon in the sale list to remove the discount. If you apply
 one - there can only be one discount applied to a sale. 
 
 A press on the printer button should enable Bluetooth. Long press to connect to the printer, if it doesn't happen automatically.
-When the printed is connected, the button will turn green.
+When the printer is connected, the button will turn green.
 
 ## Receipts
-If one instance of an item is added, it will appear as a single line on the receipt
-If more than one of an item is added, a second line will show the individual item price
-If a custom field was requested for a product, a line will show the value entered
-If a discount has been applied to the sale, individual lines will show the discounted price, and the discount percentage and total
++ If one instance of an item is added, it will appear as a single line on the receipt
++ If more than one of an item is added, a second line will show the individual item price
++ If a custom field was requested for a product, a line will show the value entered
++ If a discount has been applied to the sale, individual lines will show the discounted price, and the discount percentage and total
 saving will be shown below the items.
 
 If there are multiple VAT rates for products, the VAT rate will be shown for each product. If all products have the same rate,
 it will be printed once, below all the items. VAT information is only printed if a VAT id has been configured.
 
 A default logo will be printed on receipts. This can be updated via a data import (see below). A black and white JPG should
-work fine, around 360 x 80 pixels, 96dpi, but as previously noted, ESC/POS printers are fussy beasts.
+work fine, around 360 x 80 pixels, 96dpi, but as previously noted, ESC/POS printers are fussy beasts. Multiples of 8 pixels seem
+to keep my printer happy.
 
 ## Settings
 Tap the cog button to open the settings screen. The left hand half contains spaces to enter your business details, which are
 principally used for receipts. VAT amounts will only be calculated if you have entered a VAT id. This will create separate 'goods'
 and 'VAT' lines on the receipt, as well as the total including VAT.
 
-The order prefer is prefixed to the four digit sale number. Two or three letters should be sufficient.
+The order prefix is prefixed to the four digit sale number. Two or three letters should be sufficient.
 
-The currency name should be the three letter code, like EUR, GBP or USD, and will be printed on receipts.
+The currency name should be the standard three letter code, like EUR, GBP or USD, and will be printed on receipts.
 
 The currency symbol is displayed on screen only.
 
@@ -93,7 +97,7 @@ your changes, and return.
 
 ## Tools
 Tap Print sales logs to print out a summary of all the sales, with number of items and gross amount, followed by any refunds, and 
-then the gross amount (sales - refunds). Next follows a list of the SKUs sold, and the number of each, an if a VAT id is 
+then the gross amount (sales - refunds). Next follows a list of the SKUs sold, and the number of each, and if a VAT id is 
 configured, a summary of the total goods and total VAT.
 
 Email sales logs will prompt for an email address and then launch the default email client with a new message that has two attachments.
@@ -115,7 +119,7 @@ the app will rebuild a list of dummy products.
 ## Importing products
 When this button is tapped, you will be prompted for the URL path to a products.csv file. An https connection is assumed. The
 app is fairly flexible; if your file is located at https://my.example.com/pos/products.csv you can enter either the full URL or
-and of my.example.com/pos or my.example.com/pos/ or my.example.com/pos/products.csv
+any of my.example.com/pos or my.example.com/pos/ or my.example.com/pos/products.csv
 
 The products.csv file is a text file which must contain five, six or seven fields. There should be no header line, and all fields
 are enclosed in double quotation marks. The fields, in order, are
@@ -135,7 +139,7 @@ for that product.
 If a seventh field is present, it should contain a text description that will be prompted for when adding the item to a sale. For example,
 we allow people to donate when purchasing, with an item like this
 
-		"999","BLUF Donation €10","","0","1000","-1","member id"
+		"9999","BLUF Donation €10","","0","1000","-1","member id"
 
 When adding this item to the sale, a prompt appears "Enter member id for BLUF Donation €10" and the member id will be listed
 on the receipt and in sales records. If the field is empty, there will be no prompt.
@@ -164,12 +168,13 @@ These settings can also be updated via the app's user interface:
 + showstock: If set, stock levels will be shown on products, where configured
 
 These options cannot be altered via the app's user interface:
-+ receiptlogo: The name of an image file in the same folder, which will be printed at the top of receipts 
++ receiptlogo: The name of an image file in the same folder as business.ini, which will be printed at the top of receipts 
 + vatname: if set, will replace 'VAT' on receipts, eg MwSt or TVA
 
 #### Advanced options
-+ productsurl: If present, then after the business settings have been updated, the products will be loaded from this location. As with
-manual entry, there is flexibility, so you can just set this to my.example.com/pos/ instead of adding the https:// and products.csv
++ productsurl: If present, then after the business settings have been updated, you will be asked if you want to load products 
+from this location. As with manual entry, there is flexibility, so you can just set this to my.example.com/pos/ instead of 
+adding the https:// and products.csv
 + postback: If set, and the postbackurl is also set, controls posting of transactions to a remote server. When set to 'transaction'
 each sale will be posted when it's confirmed. When set to Batch, un-posted sales are sent, one at a time, when the Post sales log button
 is pressed
@@ -179,8 +184,7 @@ is pressed
 ## Postback format
 When postback is enabled, transactions are posted, one per call, to the specified URL as a JSON message. This enables remote processing,
 such as integrating with existing store or stock control systems, or sending emails. The example [postback.php](postback.php) file included is a simple
-example that sends a notification of a sale or refund to a specified email address. Further examples may be added later, for PrestaShop
-integration.
+script that sends a notification of a sale or refund to a specified email address.
 
 Example JSON data:
 
@@ -213,3 +217,19 @@ Example JSON data:
 		 ],
 		 "secret": "This-Is-My-Special-Secret"
 		}
+		
+### PrestaShop stock integration
+Also included is an alternative postback script, [postback-presta.php](postback-presta.php) which illustrates how you can use 
+the postback functionality to update available stock levels in a [PrestaShop](https://prestashop.com) store. Please make sure you read the notes in the
+code carefully; though it's been tested and works (with PrestaShop 1.7.8), if you are processing high volumes, or do not have
+a reliable internet connection where you're selling, there are some obvious improvements that could be made, for better
+performance and reliability. 
+
+Consider it more of a proof-of-concept.
+
+### Ecwid stock integration
+I have also included [postback-ecwid.php](postback-ecwid.php), which illustrates how you can use the [Ecwid](https://www.ecwid.com) v3 API (not available
+on free plans) to update the stock levels in an Ecwid online store. Note that I have not had an Ecwid store since 2022, so 
+this code is based on old internal scripts, and I have not been able to test it against a live store, but if they are still
+using the same API, it should work.
+
