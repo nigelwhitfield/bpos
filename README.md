@@ -61,6 +61,9 @@ one - there can only be one discount applied to a sale.
 A press on the printer button should enable Bluetooth. Long press to connect to the printer, if it doesn't happen automatically.
 When the printer is connected, the button will turn green.
 
+Long press on a product photo to set the stock level. If a passcode is required for accessing settings, it will also be required to
+update an item's stock level. 
+
 ## Receipts
 + If one instance of an item is added, it will appear as a single line on the receipt
 + If more than one of an item is added, a second line will show the individual item price
@@ -233,3 +236,7 @@ on free plans) to update the stock levels in an Ecwid online store. Note that I 
 this code is based on old internal scripts, and I have not been able to test it against a live store, but if they are still
 using the same API, it should work.
 
+## Changelog
++ 1.01: Added the ability to set stock levels on products; tweaks to sales log report format; changed code to use Resultset instead of Cursor; discount
+and stock dialogs are set to numeric input mode; better reporting of postback actions; changed printer module to use async dialog; added status display
+on settings screen
