@@ -240,3 +240,4 @@ using the same API, it should work.
 + 1.01: Added the ability to set stock levels on products; tweaks to sales log report format; changed code to use Resultset instead of Cursor; discount
 and stock dialogs are set to numeric input mode; better reporting of postback actions; changed printer module to use async dialog; added status display
 on settings screen
++ 1.02: Added checks in the status display sub to better handle empty sales logs
