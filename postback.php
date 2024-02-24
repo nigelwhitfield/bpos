@@ -5,7 +5,13 @@
 // it could be extended to update stock levels, or create a sales invoice
 // software like PrestaShop or Ecwid
 
+// This is our in-house library for sending store e-mmails
+// It includes a logo for one of our two stores (uk or eu)
+// and delivers mail via PostMark's SMTP gateway
+// You could simply use PHP's normal mail command, or
+// substitute your own email library
 require('lib/commerce/store_email.php') ;
+
 
 define('STORE', 'eu') ;
 define("NOTIFY_EMAIL", 'nigel@nigelwhitfield.eu') ;
@@ -44,6 +50,9 @@ if ($sale->secret == POSTBACK_SECRET) {
 	$message .= sprintf("<p>Total VAT  : %0.2f</p>", $sale->total-$goods) ;
 
 	$message .= '<p></p><p><b>' . $sale->currency . ' ' . $sale->total . '</p>' ;
+
+	// use our in-house email library, or substitute for the PHP mail command, eg
+	// mail(NOTIFY_EMAIL,$subject,$message) ;
 
 	send_store_email(STORE, NOTIFY_EMAIL, $subject, $message, STORE_LOGO_EU) ;
 }
