@@ -56,7 +56,8 @@ To issue a refund, put an item in the basket, and long press the red cross butto
 
 To apply a discount to a sale, tap the gift icon at the top right, and enter the percentage amount as a number, eg 5 for a 5% discount.
 You can tap the trash icon in the sale list to remove the discount. If you apply a different discount, it will replace the first
-one - there can only be one discount applied to a sale. 
+one - there can only be one discount applied to a sale. You can also set the default discount in the config file, while will be
+applied automatically when the button is pressed, with a long press still prompting for the amount.
 
 A press on the printer button should enable Bluetooth. Long press to connect to the printer, if it doesn't happen automatically.
 When the printer is connected, the button will turn green.
@@ -173,6 +174,8 @@ These settings can also be updated via the app's user interface:
 These options cannot be altered via the app's user interface:
 + receiptlogo: The name of an image file in the same folder as business.ini, which will be printed at the top of receipts 
 + vatname: if set, will replace 'VAT' on receipts, eg MwSt or TVA
++ discount: if set, eg discount = 10, this percentage will be applied automatically when the discount button is pressed. If not set,
+the user will be prompted for the percentage.
 
 #### Advanced options
 + productsurl: If present, then after the business settings have been updated, you will be asked if you want to load products 
@@ -241,3 +244,4 @@ using the same API, it should work.
 and stock dialogs are set to numeric input mode; better reporting of postback actions; changed printer module to use async dialog; added status display
 on settings screen
 + 1.02: Added checks in the status display sub to better handle empty sales logs
++ 1.03: Added the ability to configure a discount level in the business.ini file
