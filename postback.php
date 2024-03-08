@@ -46,6 +46,8 @@ if ($sale->secret == POSTBACK_SECRET) {
 	}
 	$message .= '</tbody></table>' ;
 
+	$message .= sprintf("<p>Discount rate: %s%%</p>", $sale->discount) ;
+
 	$message .= sprintf("<p>Total goods: %0.2f</p>", $goods) ;
 	$message .= sprintf("<p>Total VAT  : %0.2f</p>", $sale->total-$goods) ;
 
