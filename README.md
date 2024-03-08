@@ -26,7 +26,7 @@ Anywhere Software.
 
 ## Important notes
 This is a work in progress; it's had sufficient features added and tested for us to use at a forthcoming event, but there's
-some work needed to make the printing more reliable, especially around requesting permissons on different Android devices.
+some work needed to make the printing more reliable, especially around requesting permissions on different Android devices.
 
 Additionally, the current build has been designed to work with the [Samsung Galaxy Tab A9](https://www.samsung.com/uk/tablets/galaxy-tab-a9/buy/?modelCode=SM-X110NZAEEUB) that we're using, and little work
 has been done so far on adapting screen layouts for other size devices. You'll always get a grid with five products across,
@@ -56,7 +56,7 @@ To issue a refund, put an item in the basket, and long press the red cross butto
 
 To apply a discount to a sale, tap the gift icon at the top right, and enter the percentage amount as a number, eg 5 for a 5% discount.
 You can tap the trash icon in the sale list to remove the discount. If you apply a different discount, it will replace the first
-one - there can only be one discount applied to a sale. You can also set the default discount in the config file, while will be
+one - there can only be one discount applied to a sale. You can also set the default discount in the config file, which will be
 applied automatically when the button is pressed, with a long press still prompting for the amount.
 
 A press on the printer button should enable Bluetooth. Long press to connect to the printer, if it doesn't happen automatically.
@@ -105,8 +105,9 @@ then the gross amount (sales - refunds). Next follows a list of the SKUs sold, a
 configured, a summary of the total goods and total VAT.
 
 Email sales logs will prompt for an email address and then launch the default email client with a new message that has two attachments.
-sales.csv is the summary of each sale, with salesref, date, amount and number of items. lineitems.csv contains all the individual
-items sold, with the salesref, sku, quantity, price, vatrate and total.
+sales.csv is the summary of each sale, with salesref, date, amount, number of items, number of SKUs, order prefix and discount rate.
+
+lineitems.csv contains all the individual items sold, with the salesref, sku, quantity, price, vatrate and total paid.
 
 Post sales log will post transactions in JSON format to a remote URL. This option is described in more detail later.
 
@@ -201,6 +202,7 @@ Example JSON data:
 		 "currency": "EUR",
 		 "total": "45.00",
 		 "items": 2,
+		 "discount" : "10.0"
 		 "lineitems": [
 		   {
 			 "sku": 500,
@@ -245,3 +247,7 @@ and stock dialogs are set to numeric input mode; better reporting of postback ac
 on settings screen
 + 1.02: Added checks in the status display sub to better handle empty sales logs
 + 1.03: Added the ability to configure a discount level in the business.ini file
++ 1.10: The database now logs the prefix, and discount rate applied with each others. This means you can change the prefix for different days, for example,
+without affecting pre-existing orders. Logs now also correctly count items (previous it actually counted SKUs, and included discount as an SKU), and list
+the number of SKUs separately. The reference of the current sale is now displayed above the total. This allows users to enter it on POS terminals that support
+adding an order reference (eg MyPOS Go).
