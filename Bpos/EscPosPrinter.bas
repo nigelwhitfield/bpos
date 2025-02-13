@@ -154,10 +154,8 @@ Public Sub ConnectedErrorMsg As String
 	Return ConnectedError
 End Sub
 
-' Ask the user to connect to a printer and return whether she tried or not
-' If True then a subsequent Connected event will indicate success or failure
+#If B4A
 Public Sub Connect
-	#If B4A
 	Dim PairedDevices As Map = GetPairedDevices
 	Dim l As List
 	l.Initialize
@@ -170,10 +168,13 @@ Public Sub Connect
 		Serial1.Connect(PairedDevices.Get(l.Get(Res))) 'convert the name to mac address
 		RemoteMAC = PairedDevices.Get(l.Get(Res))
 		Log("Device MAC is " & RemoteMAC)
-	'Return True
+		'Return True
 	End If
 	'Return False
-	#Else If B4J
+End Sub
+#End If
+#If B4J
+Public Sub Connect
 	Dim PairedDevices As List = GetComPorts
 	For Each port In PairedDevices
 		Log(port)
@@ -189,8 +190,8 @@ Public Sub Connect
 		ConnectedError = LastException.Message
 		DisConnect
 	End Try
-	#End If
 End Sub
+#End If
 
 #If B4A
 Public Sub GetPairedDevices As Map
