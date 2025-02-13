@@ -4,9 +4,6 @@ ModulesStructureVersion=1
 Type=Class
 Version=9.01
 @EndOfDesignText@
-#IgnoreWarnings: 9
-' 9 = unused variable
-
 Sub Class_Globals
 	' 1.0	Initial version
 	' 2.0	Added FeedPaper, changed many WriteString(.." &  Chr(number)) instances to WriteBytes(params)
@@ -15,41 +12,43 @@ Sub Class_Globals
 	'			Added user defined characters, DefineCustomCharacter, DeleteCustomCharacter and setUseCustomCharacters
 	'			Addedhelper methods CreateCustomCharacter, CreateLine, CreateBox and CreateCircle
 	' 2.1	Update by Nigel to add ReConnect and store mac address
-	Private Version As Double = 2.1 ' Printer class version	
+	' 3.0	Updated by Aeric for B4J
 	
-	Type AnImage(Width As Int, Height As Int, Data() As Byte)
+	Private Version As Double = 3.0 ' Printer class version	 'ignore
+
+	Type AnImage (Width As Int, Height As Int, Data() As Byte)
 	
 	Private EventName As String 'ignore
 	Private CallBack As Object 'ignore
-	
+
 	Private Serial1 As Serial
 	Private Astream As AsyncStreams
 	Private Connected As Boolean
 	Private ConnectedError As String
 	
 	Dim ESC As String = Chr(27)
-	Dim FS As String = Chr(28)
+	Dim FS As String = Chr(28)	'ignore
 	Dim GS As String = Chr(29)
 	
 	'Bold and underline don't work well in reversed text
 	Dim UNREVERSE As String  = GS & "B" & Chr(0)
-	Dim REVERSE As String = GS & "B" & Chr(1)
+	Dim REVERSE As String = GS & "B" & Chr(1)	'ignore
 	
 	' Character orientation. Print upside down from right margin
 	Dim UNINVERT As String = ESC & "{0"
-	Dim INVERT As String = ESC & "{1"
+	Dim INVERT As String = ESC & "{1"	'ignore
 	
 	' Character rotation clockwise. Not much use without also reversing the printed character sequence
 	Dim UNROTATE As String = ESC & "V0"
-	Dim ROTATE As String = ESC & "V1"
+	Dim ROTATE As String = ESC & "V1"	'ignore
 	
 	' Horizontal tab
 	Dim HT As String = Chr(9)
 	
 	' Character underline
 	Dim ULINE0 As String = ESC & "-0"
-	Dim ULINE1 As String = ESC & "-1"
-	Dim ULINE2 As String = ESC & "-2"
+	Dim ULINE1 As String = ESC & "-1"	'ignore
+	Dim ULINE2 As String = ESC & "-2"	'ignore
 	
 	' Character emphasis
 	Dim BOLD As String = ESC & "E1"
@@ -57,7 +56,7 @@ Sub Class_Globals
 	
 	' Character height and width
 	Dim SINGLE As String = GS & "!" & Chr(0x00)
-	Dim HIGH As String = GS & "!" & Chr(0x01)
+	Dim HIGH As String = GS & "!" & Chr(0x01)	'ignore
 	Dim WIDE As String = GS & "!" & Chr(0x10)
 	Dim HIGHWIDE As String = GS & "!" & Chr(0x11)
 	
@@ -70,10 +69,12 @@ Sub Class_Globals
 	Private CHARSPACING0 As String = ESC & " " & Chr(0)
 	Private CHARFONT0 As String = ESC & "M" & Chr(0)
 	Dim DEFAULTS As String =  CHARSPACING0 & CHARFONT0 & LMARGIN0 & WIDTH0 & LINSET0 & LINEDEFAULT & LEFTJUSTIFY _
-		& UNINVERT & UNROTATE & UNREVERSE & NOBOLD & ULINE0	
-		
+		& UNINVERT & UNROTATE & UNREVERSE & NOBOLD & ULINE0		'ignore
+	#If B4A
 	Public RemoteMAC As String
-
+	#Else If B4J
+	Public ComPort As String
+	#End If
 End Sub
 
 '**********
@@ -81,22 +82,46 @@ End Sub
 '**********
 
 'Initialize the object with the parent and event name
-Public Sub Initialize(vCallback As Object, vEventName As String)
+Public Sub Initialize (vCallback As Object, vEventName As String)
 	EventName = vEventName
 	CallBack = vCallback
-	Serial1.Initialize("Serial1")	
+	Serial1.Initialize("Serial1")
 	Connected = False
 	ConnectedError = ""
 End Sub
 
-' Returns any error raised by the last attempt to connect a printer
-Public Sub ConnectedErrorMsg As String
-	Return ConnectedError
+#If B4A
+Public Sub ConnectByName (devicename As String) As Boolean
+	Dim PairedDevices As Map
+	PairedDevices = Serial1.GetPairedDevices
+	
+	For i = 0 To PairedDevices.Size -1
+		If PairedDevices.GetKeyAt(i) = devicename Then
+			Log("Attempting to reconnect to " & devicename)
+			Serial1.Connect(PairedDevices.Get(devicename))
+			Return True
+		End If
+	Next
+End Sub
+#End If
+
+' Disconnect the printer
+Public Sub DisConnect
+	#If B4A
+	Serial1.Disconnect
+	#Else If B4J
+	Serial1.Close
+	Astream.Close
+	#End If
+	Connected = False
 End Sub
 
-' Returns whether a printer is connected or not
-Public Sub IsConnected As Boolean
-	Return Connected
+#If B4A
+' Connect to a specific printer via MAC address
+Public Sub ReConnect (mac As String) As Boolean
+	Log("Connecting to printer " & mac)
+	Serial1.Connect(mac)
+	Return True
 End Sub
 
 ' Returns whether Bluetooth is on or off
@@ -111,57 +136,67 @@ End Sub
 Public Sub ConnectedDevice As String
 	Return Serial1.Name
 End Sub
+#Else If B4J
+' Connect to a specific printer via COM port
+Public Sub ReConnect (port As String) As Boolean
+	Log("Connecting to printer port " & port)
+	Serial1.Open(port)
+	Return True
+End Sub
+#End If
+
+' Returns whether a printer is connected or not
+Public Sub IsConnected As Boolean
+	Return Connected
+End Sub
+
+' Returns any error raised by the last attempt to connect a printer
+Public Sub ConnectedErrorMsg As String
+	Return ConnectedError
+End Sub
 
 ' Ask the user to connect to a printer and return whether she tried or not
 ' If True then a subsequent Connected event will indicate success or failure
-Public Sub Connect 
-	Dim PairedDevices As Map
-	PairedDevices = Serial1.GetPairedDevices
-	Dim l As List
-	l.Initialize
-	For i = 0 To PairedDevices.Size - 1
-		l.Add(PairedDevices.GetKeyAt(i))
-	Next
-	Dim Res As Int
-	' Updated by nwhitfield to use async input list
-	'Res = InputList(l, "Choose a printer", -1) 'show list with paired devices
-	InputListAsync(l,"Choose a printer",-1,True)
+Public Sub Connect
+	#If B4A
+	Dim PairedDevices As Map = GetPairedDevices
+	InputListAsync(l, "Choose a printer", -1, True)
 	Wait for InputList_Result (Res As Int)
 	If Res <> DialogResponse.CANCEL Then
 		Serial1.Connect(PairedDevices.Get(l.Get(Res))) 'convert the name to mac address
 		RemoteMAC = PairedDevices.Get(l.Get(Res))
 		Log("Device MAC is " & RemoteMAC)
-		'Return True
+	'Return True
 	End If
 	'Return False
-End Sub
-
-' Connect to a specific printer via MAC address
-public Sub ReConnect (mac As String ) As Boolean
-	Log("Connecting to printer " & mac)
-	Serial1.Connect(mac)
-	Return True
-End Sub
-
-public Sub ConnectByName( devicename As String ) As Boolean
-	Dim PairedDevices As Map
-	PairedDevices = Serial1.GetPairedDevices
-	
-	For i = 0 To PairedDevices.Size -1
-		If PairedDevices.GetKeyAt(i) = devicename Then
-			Log("Attempting to reconnect to " & devicename)
-			Serial1.Connect(PairedDevices.Get(devicename))
-			Return True
-		End If
+	#Else If B4J
+	Dim PairedDevices As List = GetComPorts
+	For Each port In PairedDevices
+		Log(port)
 	Next
+	ComPort = PairedDevices.Get(6) ' paired virtual COM port (check device manager)
+	Log("Connecting to COM port " & ComPort)
+	Try
+		Serial1.Open(ComPort)
+		Astream.InitializePrefix(Serial1.GetInputStream, True, Serial1.GetOutputStream, "astream")
+		Connected = True
+	Catch
+		Log(LastException)
+		ConnectedError = LastException.Message
+		DisConnect
+	End Try
+	#End If
 End Sub
 
-
-' Disconnect the printer
-Public Sub DisConnect
-	Serial1.Disconnect
-	Connected = False
+#If B4A
+Public Sub GetPairedDevices As Map
+	Return Serial1.GetPairedDevices
 End Sub
+#Else If B4J
+Public Sub GetComPorts As List
+	Return Serial1.ListPorts
+End Sub
+#End If
 
 ' Reset the printer to the power on state
 Public Sub Reset
@@ -307,7 +342,12 @@ End Sub
 ' Beware of using WriteString with Chr() to send numeric values as they may be affected by Unicode to codepage translations
 ' Most character level operations are pre-defined as UPPERCASE string variables for easy concatenation with other string data
 Public Sub WriteString(data As String)
+	#If B4A
 	WriteString2(data, "IBM437")
+	#End If
+	#If B4J
+	WriteString2(data, "CP437") ' added by Aeric
+	#End If
 End Sub
 
 ' Send the string to the printer in the specified encoding
@@ -728,7 +768,7 @@ End Sub
 
 ' Printer support method for pre-processing images to print
 ' Convert the bitmap supplied to an array of pixel values representing the luminance value of each original pixel
-Sub ImageToBWIMage(bmp As Bitmap) As AnImage
+Public Sub ImageToBWIMage (bmp As B4XBitmap) As AnImage
 	Dim BC As BitmapCreator 'ignore
 	Dim W As Int = bmp.Width
 	Dim H As Int = bmp.Height
@@ -736,14 +776,20 @@ Sub ImageToBWIMage(bmp As Bitmap) As AnImage
 
 	For y = 0 To H - 1
 		For x = 0 To W - 1
-			Dim j As Int = bmp.GetPixel(x, y)
+			#If B4A
+			Dim j As Int = bmp.As(Bitmap).GetPixel(x, y) ' Aeric: not tested
+			#Else If B4i
+			Dim j As Int = GetPixelColor(bmp, x, y)
+			#Else
+			Dim j As Int = bmp.As(Image).GetPixel(x, y)
+			#End If
 			' convert color to approximate luminance value
 			Dim col As ARGBColor
 			BC.ColorToARGB(j, col )
-			Dim lum As Int = col.r * 0.2 + col.b*0.1 + col.g*0.7
+			Dim lum As Int = col.r * 0.2 + col.b * 0.1 + col.g * 0.7
 			If lum> 255 Then lum = 255
 			' save the pixel luminance
-			pixels(y*W + x) = lum
+			pixels(y * W + x) = lum
 		Next
 	Next
 	Dim ret As AnImage
@@ -778,7 +824,7 @@ End Sub
 ' The dithering algorithm is the simplest one-dimensional error diffusion algorithm
 ' Normally threshold should be 128 but some images may look better with a little more or less.
 ' This algorithm tends to produce vertical lines. DitherImage2D will probably look far better
-Sub DitherImage1D(img As AnImage, threshold As Int) As AnImage
+Public Sub DitherImage1D (img As AnImage, threshold As Int) As AnImage
 	Dim pixels(img.Data.Length) As Byte
 	Dim error As Int
 	For y = 0 To img.Height - 1
@@ -809,7 +855,7 @@ End Sub
 ' The dithering algorithm is the simplest two-dimensional error diffusion algorithm
 ' Normally threshold should be 128 but some images may look better with a little more or less.
 ' Anything more sophisticated might be overkill considering the image quality of most thermal printers
-Sub DitherImage2D(img As AnImage, threshold As Int) As AnImage
+Public Sub DitherImage2D (img As AnImage, threshold As Int) As AnImage
 	Dim pixels(img.Data.Length) As Byte
 	Dim xerror As Int
 	Dim yerrors(img.Width) As Int
@@ -1129,7 +1175,7 @@ End Sub
 '-----------------------
 ' Internal Serial Events
 '-----------------------
-
+#If B4A
 Private Sub Serial1_Connected (Success As Boolean)
 	If Success Then
 		Astream.Initialize(Serial1.InputStream, Serial1.OutputStream, "astream")
@@ -1144,27 +1190,43 @@ Private Sub Serial1_Connected (Success As Boolean)
 		CallSub2(CallBack, EventName & "_Connected", Success)
 	End If
 End Sub
+#End If
 
 '----------------------------
 ' Internal AsyncStream Events
 '----------------------------
 
 Private Sub AStream_NewData (Buffer() As Byte)
+	#If B4A
 	If SubExists(CallBack, EventName & "_NewData") Then
 		CallSub2(CallBack, EventName & "_NewData", Buffer)
 	End If
 	Log("Data " & Buffer(0))
+	#Else If B4J
+	Dim msg As String = BytesToString(Buffer, 0, Buffer.Length, "UTF8")
+	Log("AStream_NewData = " & msg)
+	#End If
 End Sub
 
 Private Sub AStream_Error
+	#If B4A
 	If SubExists(CallBack, EventName & "_Error") Then
 		CallSub(CallBack, EventName & "_Error")
 	End If
+	#Else If B4J
+	Log(LastException.Message)
+	Astream.Close
+	#End If	
 End Sub
 
 Private Sub AStream_Terminated
+	#If B4A
 	Connected = False
 	If SubExists(CallBack, EventName & "_Terminated") Then
 		CallSub(CallBack, EventName & "_Terminated")
 	End If	
+	#Else If B4J
+	Connected = False
+	Log("AStream_Terminated")
+	#End If	
 End Sub

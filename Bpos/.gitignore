@@ -6,7 +6,9 @@
 AutoBackups/
 
 # Include icon.png inside drawable
-Objects/*
-!Objects/res/
-Objects/res/*
-!Objects/res/drawable/
+B4J/Objects
+B4i/Objects
+B4A/Objects/*
+!B4A/Objects/res/
+B4A/Objects/res/*
+!B4A/Objects/res/drawable/
