@@ -92,9 +92,7 @@ End Sub
 
 #If B4A
 Public Sub ConnectByName (devicename As String) As Boolean
-	Dim PairedDevices As Map
-	PairedDevices = Serial1.GetPairedDevices
-	
+	Dim PairedDevices As Map = GetPairedDevices
 	For i = 0 To PairedDevices.Size -1
 		If PairedDevices.GetKeyAt(i) = devicename Then
 			Log("Attempting to reconnect to " & devicename)
@@ -102,6 +100,7 @@ Public Sub ConnectByName (devicename As String) As Boolean
 			Return True
 		End If
 	Next
+	Return False
 End Sub
 #End If
 
@@ -160,6 +159,11 @@ End Sub
 Public Sub Connect
 	#If B4A
 	Dim PairedDevices As Map = GetPairedDevices
+	Dim l As List
+	l.Initialize
+	For Each device As String In PairedDevices.Keys
+		l.Add(device)
+	Next
 	InputListAsync(l, "Choose a printer", -1, True)
 	Wait for InputList_Result (Res As Int)
 	If Res <> DialogResponse.CANCEL Then
