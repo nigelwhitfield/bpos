@@ -1,0 +1,14 @@
+# ignore files
+*.meta
+*.zip
+
+# ignore ALL files in these directories
+AutoBackups/
+
+# Include icon.png inside drawable
+B4J/Objects
+B4i/Objects
+B4A/Objects/*
+!B4A/Objects/res/
+B4A/Objects/res/*
+!B4A/Objects/res/drawable/

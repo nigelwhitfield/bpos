@@ -1,0 +1,139 @@
+﻿Build1=Default,com.nigelwhitfield.bpos
+File1=lineitem.bal
+File10=product02.png
+File11=product03.png
+File12=product04.png
+File13=product05.png
+File14=product06.png
+File15=product07.png
+File16=product08.png
+File17=product09.png
+File18=product10.png
+File19=settings.bal
+File2=Logo B POS.png
+File20=sku.bal
+File3=logo.jpg
+File4=mono.jpg
+File5=noimage.png
+File6=OUpos.png
+File7=OUtill.png
+File8=pos.bal
+File9=product01.png
+FileGroup1=Default Group
+FileGroup10=Default Group
+FileGroup11=Default Group
+FileGroup12=Default Group
+FileGroup13=Default Group
+FileGroup14=Default Group
+FileGroup15=Default Group
+FileGroup16=Default Group
+FileGroup17=Default Group
+FileGroup18=Default Group
+FileGroup19=Default Group
+FileGroup2=Default Group
+FileGroup20=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+FileGroup5=Default Group
+FileGroup6=Default Group
+FileGroup7=Default Group
+FileGroup8=Default Group
+FileGroup9=Default Group
+Group=Default Group
+Library1=b4xcollections
+Library10=randomaccessfile
+Library11=runtimepermissions
+Library12=serial
+Library13=sql
+Library14=stringutils
+Library15=xcustomlistview
+Library16=xui views
+Library2=b4xpages
+Library3=bitmapcreator
+Library4=core
+Library5=fileprovider
+Library6=json
+Library7=keyvaluestore
+Library8=okhttputils2
+Library9=phone
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="33"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.LightTheme)~\n~'End of default text.~\n~AddPermission("android.permission.BLUETOOTH_SCAN")~\n~AddPermission("android.permission.BLUETOOTH_CONNECT")~\n~AddPermission("android.permission.BLUETOOTH_ADVERTISE")~\n~AddPermission("android.permission.ACCESS_FINE_LOCAtion")~\n~AddManifestText(<uses-permission~\n~	android:name="android.permission.WRITE_EXTERNAL_STORAGE"~\n~	android:maxSdkVersion="18" />~\n~)~\n~~\n~AddApplicationText(~\n~  <provider~\n~  android:name="android.support.v4.content.FileProvider"~\n~  android:authorities="$PACKAGE$.provider"~\n~  android:exported="false"~\n~  android:grantUriPermissions="true">~\n~  <meta-data~\n~  android:name="android.support.FILE_PROVIDER_PATHS"~\n~  android:resource="@xml/provider_paths"/>~\n~  </provider>~\n~)~\n~CreateResource(xml, provider_paths,~\n~   <files-path name="name" path="shared" />~\n~)~\n~
+Module1=|relative|..\B4XMainPage
+Module2=|relative|..\EscPosPrinter
+Module3=|relative|..\SettingsPage
+Module4=Starter
+NumberOfFiles=20
+NumberOfLibraries=16
+NumberOfModules=4
+Version=12.8
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: B-POS
+	#VersionCode: 1
+	#VersionName: 1.1
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: landscape
+	#CanInstallToExternalStorage: False
+	#BridgeLogger: True
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: True
+	#IncludeTitle: False
+#End Region
+
+Sub Process_Globals
+	Public ActionBarHomeClicked As Boolean
+
+End Sub
+
+Sub Globals
+	
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	'Activity.AddMenuItem("Settings", "mnuSettings")
+	Dim pm As B4XPagesManager
+	pm.Initialize(Activity)
+	pm.LogEvents = True
+	'nfc.PreparePushMessage("nfc")
+End Sub
+
+
+
+'Template version: B4A-1.01
+#Region Delegates
+
+Sub Activity_ActionBarHomeClick
+	ActionBarHomeClicked = True
+	B4XPages.Delegate.Activity_ActionBarHomeClick
+	ActionBarHomeClicked = False
+End Sub
+
+Sub Activity_KeyPress (KeyCode As Int) As Boolean
+	Return B4XPages.Delegate.Activity_KeyPress(KeyCode)
+End Sub
+
+Sub Activity_Resume
+	B4XPages.Delegate.Activity_Resume
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+	B4XPages.Delegate.Activity_Pause
+End Sub
+
+Sub Activity_PermissionResult (Permission As String, Result As Boolean)
+	B4XPages.Delegate.Activity_PermissionResult(Permission, Result)
+End Sub
+
+Sub Create_Menu (Menu As Object)
+	B4XPages.Delegate.Create_Menu(Menu)
+End Sub
+
+#if Java
+public boolean _onCreateOptionsMenu(android.view.Menu menu) {
+	 processBA.raiseEvent(null, "create_menu", menu);
+	 return true;
+	
+}
+#End If
+#End Region

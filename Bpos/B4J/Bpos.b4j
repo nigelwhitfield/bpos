@@ -1,0 +1,113 @@
+﻿AppType=JavaFX
+Build1=Default,com.nigelwhitfield.bpos
+File1=Lineitem.bjl
+File10=product02.png
+File11=product03.png
+File12=product04.png
+File13=product05.png
+File14=product06.png
+File15=product07.png
+File16=product08.png
+File17=product09.png
+File18=product10.png
+File19=Settings.bjl
+File2=logo b pos.png
+File20=Sku.bjl
+File3=logo.jpg
+File4=mono.jpg
+File5=noimage.png
+File6=oupos.png
+File7=outill.png
+File8=Pos.bjl
+File9=product01.png
+FileGroup1=Default Group
+FileGroup10=Default Group
+FileGroup11=Default Group
+FileGroup12=Default Group
+FileGroup13=Default Group
+FileGroup14=Default Group
+FileGroup15=Default Group
+FileGroup16=Default Group
+FileGroup17=Default Group
+FileGroup18=Default Group
+FileGroup19=Default Group
+FileGroup2=Default Group
+FileGroup20=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+FileGroup5=Default Group
+FileGroup6=Default Group
+FileGroup7=Default Group
+FileGroup8=Default Group
+FileGroup9=Default Group
+Group=Default Group
+Library1=b4xpages
+Library10=xui views
+Library2=jcore
+Library3=jfx
+Library4=jokhttputils2
+Library5=jrandomaccessfile
+Library6=jserial
+Library7=json
+Library8=jsql
+Library9=keyvaluestore
+Module1=|relative|..\B4XMainPage
+Module2=|relative|..\EscPosPrinter
+Module3=|relative|..\SettingsPage
+NumberOfFiles=20
+NumberOfLibraries=10
+NumberOfModules=3
+Version=10
+@EndOfDesignText@
+' Product: BPOS (Point of Sales)
+' Version: 2024.10.001
+
+#Region Project Attributes 
+	#MainFormWidth: 1270 
+	#MainFormHeight: 640
+#End Region
+#Region Package Property
+	#PackagerProperty: ExeName = B-POS
+#End Region
+#Region Additional Jars
+	#AdditionalJar: sqlite-jdbc-3.7.2
+#End Region
+Sub Process_Globals
+	Public DB 			As SQL
+	Private FX 			As JFX
+	Private MainForm 	As Form
+End Sub
+
+Sub AppStart (Form1 As Form, Args() As String)
+	MainForm = Form1
+	MainForm.Show
+	MainForm.Icon = FX.LoadImage(File.DirAssets, "logo.jpg")
+	MainForm.WindowLeft = 0
+	MainForm.WindowTop = 0
+	'MainForm.WindowWidth = GetEnvironmentVariable
+	Dim PagesManager As B4XPagesManager
+	PagesManager.Initialize(MainForm)
+End Sub
+
+'Template version: B4J-1.0
+#Region Delegates
+Sub MainForm_FocusChanged (HasFocus As Boolean)
+	B4XPages.Delegate.MainForm_FocusChanged(HasFocus)
+End Sub
+
+Sub MainForm_Resize (Width As Double, Height As Double)
+	B4XPages.Delegate.MainForm_Resize(Width, Height)
+End Sub
+
+Sub MainForm_Closed
+	B4XPages.Delegate.MainForm_Closed
+End Sub
+
+Sub MainForm_CloseRequest (EventData As Event)
+	B4XPages.Delegate.MainForm_CloseRequest(EventData)
+End Sub
+
+Public Sub MainForm_IconifiedChanged (Iconified As Boolean)
+	B4XPages.Delegate.MainForm_IconifiedChanged(Iconified)
+End Sub
+#End Region
