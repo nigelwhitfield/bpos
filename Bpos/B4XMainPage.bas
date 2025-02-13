@@ -695,19 +695,12 @@ End Sub
 
 Private Sub handlePrinter As ResumableSub
 	If Printer1.IsConnected = False Then
-		Dim comport As String '= settingsdb.GetDefault("comport", "")
-		'If comport = "" Then
+		Dim comport As String
 		DevicesMap.Initialize
-		'Dim M1 As Map = Printer1.GetFriendlyNames
 		Dim options As List
 		options.Initialize
-		'If M1.IsInitialized Then
-		'	For Each Key As String In M1.Keys
-		'		DevicesMap.Put(M1.Get(Key), Key)
-		'		options.Add(M1.Get(Key))
-		'	Next
-		'End If
-		' Manually add BLE printer through virtual COM port
+		' Aeric: Temporary hardcoded
+		' TODO: Allow user to set printer name and com port and save to KVS
 		Dim PrinterPort As String = "COM9"
 		Dim PrinterName As String = $"MP583 (${PrinterPort})"$
 		DevicesMap.Put(PrinterName, PrinterPort)
@@ -731,10 +724,6 @@ Private Sub handlePrinter As ResumableSub
 		If Printer1.ConnectedErrorMsg <> "" Then
 			xui.MsgboxAsync(Printer1.ConnectedErrorMsg, "Error connecting")
 		End If
-		'Else
-		'	Printer1.ComPort = comport
-		'	Printer1.ReConnect
-		'End If
 	Else
 		Printer1.DisConnect
 		Log("Printer disconnected")
