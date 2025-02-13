@@ -116,11 +116,14 @@ Public Sub DisConnect
 End Sub
 
 #If B4A
+Public Sub setRemoteMac (Name As String)
+	RemoteMAC = Name
+End Sub
+
 ' Connect to a specific printer via MAC address
-Public Sub ReConnect (mac As String) As Boolean
-	Log("Connecting to printer " & mac)
-	Serial1.Connect(mac)
-	Return True
+Public Sub ReConnect
+	Log("Connecting to printer " & RemoteMAC)
+	Serial1.Connect(RemoteMAC)
 End Sub
 
 ' Returns whether Bluetooth is on or off
@@ -136,11 +139,21 @@ Public Sub ConnectedDevice As String
 	Return Serial1.Name
 End Sub
 #Else If B4J
+Public Sub setComPort (Name As String)
+	ComPort = Name
+End Sub
+
 ' Connect to a specific printer via COM port
-Public Sub ReConnect (port As String) As Boolean
-	Log("Connecting to printer port " & port)
-	Serial1.Open(port)
-	Return True
+Public Sub ReConnect
+	Log("Connecting to printer at " & ComPort)
+	Try
+		Serial1.Open(ComPort)
+		Connected = True
+	Catch
+		Log(LastException)
+		ConnectedError = LastException.Message
+		DisConnect
+	End Try
 End Sub
 #End If
 
@@ -175,16 +188,12 @@ End Sub
 #End If
 #If B4J
 Public Sub Connect
-	Dim PairedDevices As List = GetComPorts
-	For Each port In PairedDevices
-		Log(port)
-	Next
-	ComPort = PairedDevices.Get(6) ' paired virtual COM port (check device manager)
-	Log("Connecting to COM port " & ComPort)
 	Try
+		Log("Connecting to COM port " & ComPort)
 		Serial1.Open(ComPort)
 		Astream.InitializePrefix(Serial1.GetInputStream, True, Serial1.GetOutputStream, "astream")
 		Connected = True
+		Log("Printer connected")
 	Catch
 		Log(LastException)
 		ConnectedError = LastException.Message

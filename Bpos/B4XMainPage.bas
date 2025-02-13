@@ -12,10 +12,9 @@ Version=9.85
 'Ctrl + click to export as zip: ide://run?File=%B4X%\Zipper.jar&Args=%PROJECT_NAME%.zip
 
 Sub Class_Globals
-	
 	Private Root As B4XView
 	Private xui As XUI
-	
+	Private DevicesMap As Map
 	Private dialog As B4XDialog
 	
 	Private Button_Cancel As B4XView
@@ -372,20 +371,14 @@ Sub PrintReceipt (saleid As Int)
 	Dim refund As Boolean = False
 	If saleid < 0 Then
 		refund = True
-		saleid = -1*saleid
+		saleid = -1 * saleid
 	End If
+	Wait For (handlePrinter) Complete (Result As Boolean)
+	Log(Result)
 
 	If Printer1.IsConnected = False Then
-		If settingsdb.GetDefault("printerid", "") <> "" Then
-			Printer1.ReConnect(settingsdb.Get("printerid"))
-		Else
-			Printer1.Connect
-		End If
+		Return
 	End If
-
-'	If Printer1.IsConnected Then
-'		Return
-'	End If
 	
 	Printer1.Reset
 	Printer1.codepage = 71 ' western europe
@@ -602,7 +595,7 @@ Private Sub Label_Settings_Click
 		pin.Initialize
 		pin.lblTitle.Text = "Enter settings passcode"
 		
-		Wait For( dialog.showTemplate(pin, "OK", "", "Cancel")) Complete (Result As Int)
+		Wait For(dialog.showTemplate(pin, "OK", "", "Cancel")) Complete (Result As Int)
 		If Result = xui.DialogResponse_Positive And pin.Text = settingsdb.Get("passcode") Then 
 			B4XPages.ShowPage("settings")
 		Else
@@ -673,9 +666,11 @@ Private Sub handlePrinter
 		xui.MsgboxAsync("Please enable Bluetooth and connect a Bluetooth printer", "Bluetooth error")
 	Else If Printer1.IsConnected = False Then
 		Log("Trying to connect")
-		If settingsdb.GetDefault("printerid", "") <> "" Then
+		Dim printerid As String = settingsdb.GetDefault("printerid", "")
+		Printer1.RemoteMac = printerid
+		If printerid <> "" Then
 			Log("Reusing printer id")
-			Printer1.ReConnect(settingsdb.Get("printerid"))
+			Printer1.ReConnect
 		Else
 			Log("Calling Connect")
 			Printer1.Connect
@@ -690,30 +685,66 @@ End Sub
 #If B4J
 Private Sub Label_Printer_MouseClicked (EventData As MouseEvent)
 	'If EventData.SecondaryButtonPressed Then
-		handlePrinter
+		Wait For (handlePrinter) Complete (Result As Boolean)
+		Log(Result)
 	'	'Return
 	'Else
 	'	Log("Init Printer")
 	'End If
 End Sub
 
-Private Sub handlePrinter
+Private Sub handlePrinter As ResumableSub
 	If Printer1.IsConnected = False Then
-		Log("Trying to connect")
-		If settingsdb.GetDefault("printerid", "") <> "" Then
-			Log("Reusing printer id")
-			Printer1.ReConnect(settingsdb.Get("printerid"))
+		Dim comport As String '= settingsdb.GetDefault("comport", "")
+		'If comport = "" Then
+		DevicesMap.Initialize
+		'Dim M1 As Map = Printer1.GetFriendlyNames
+		Dim options As List
+		options.Initialize
+		'If M1.IsInitialized Then
+		'	For Each Key As String In M1.Keys
+		'		DevicesMap.Put(M1.Get(Key), Key)
+		'		options.Add(M1.Get(Key))
+		'	Next
+		'End If
+		' Manually add BLE printer through virtual COM port
+		Dim PrinterPort As String = "COM9"
+		Dim PrinterName As String = $"MP583 (${PrinterPort})"$
+		DevicesMap.Put(PrinterName, PrinterPort)
+		options.Add(PrinterName)
+		dialog.Title = "Select a device"
+		Dim lst As B4XListTemplate
+		lst.Initialize
+		lst.Options = options
+		Wait For(dialog.ShowTemplate(lst, "OK", "", "Cancel")) Complete (Result As Int)
+		If Result = xui.DialogResponse_Positive Then
+			comport = DevicesMap.Get(lst.SelectedItem)
+			settingsdb.Put("comport", comport)
 		Else
-			Log("Calling Connect")
-			Printer1.Connect
-			If Printer1.IsConnected Then
-				Label_Printer.TextColor = xui.Color_Green
-			End If
+			Return False
 		End If
+		If comport <> "" Then
+			Printer1.ComPort = comport
+			Printer1.Connect
+		End If
+		
+		If Printer1.ConnectedErrorMsg <> "" Then
+			xui.MsgboxAsync(Printer1.ConnectedErrorMsg, "Error connecting")
+		End If
+		'Else
+		'	Printer1.ComPort = comport
+		'	Printer1.ReConnect
+		'End If
 	Else
 		Printer1.DisConnect
+		Log("Printer disconnected")
+	End If
+	If Printer1.IsConnected Then
+		Label_Printer.TextColor = xui.Color_Green
+	Else
 		Label_Printer.TextColor = xui.Color_Black
 	End If
+	Return True
 End Sub
 #End If
 
